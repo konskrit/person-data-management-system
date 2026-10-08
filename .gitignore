@@ -1,0 +1,76 @@
+## .NET
+bin/
+obj/
+out/
+[Bb]uild/
+[Ll]og/
+[Ll]ogs/
+
+## Visual Studio / Rider / VS Code
+.vs/
+.vscode/
+.idea/
+*.user
+*.userosscache
+*.suo
+*.userprefs
+*.sln.docstates
+
+## NuGet
+*.nupkg
+*.snupkg
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+## Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+## Test & coverage
+[Tt]est[Rr]esult*/
+*[Tt]est[Rr]esult*
+coverage*.json
+coverage*.xml
+*.coverage
+*.coveragexml
+*.opencover.xml
+
+## Publish / deploy
+publish/
+*.publishsettings
+*.pubxml
+*.pubxml.user
+
+## OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+## Secrets / local env
+*.env
+.env.*
+appsettings.*.local.json
+secrets.json
+
+## Misc
+*.log
+*.tmp
+*.temp
+*.swp
+*~
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
