@@ -60,8 +60,10 @@ Thumbs.db
 Desktop.ini
 
 ## Secrets / local env
+.env
 *.env
 .env.*
+!.env.example
 appsettings.*.local.json
 secrets.json
 
