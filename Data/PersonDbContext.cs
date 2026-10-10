@@ -11,6 +11,10 @@ public class PersonDbContext(DbContextOptions<PersonDbContext> options) : DbCont
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Person>().ToTable("Person");
+        modelBuilder.Entity<Address>().ToTable("Address");
+        modelBuilder.Entity<Phone>().ToTable("Phone");
+
         modelBuilder.Entity<Address>()
             .HasOne(x => x.Person)
             .WithMany(x => x.Addresses)
