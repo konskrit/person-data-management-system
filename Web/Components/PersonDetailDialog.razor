@@ -1,0 +1,79 @@
+@using PersonDataManagementSystem.Application.Dtos
+@using PersonDataManagementSystem.Application.Interfaces
+@inject IPersonService PersonService
+
+<FluentDialogBody FixedHeaderFooter="true">
+    <TitleTemplate>
+        Person details
+    </TitleTemplate>
+
+    <ChildContent>
+        @if (detail is null)
+        {
+            <p>Loading...</p>
+        }
+        else
+        {
+            <div class="person-detail">
+                <h4>Name</h4>
+                <p>@detail.FirstName @detail.LastName</p>
+
+                <h4>Birth date</h4>
+                <p>@detail.BirthDate.ToString("yyyy-MM-dd")</p>
+
+                <h4>Addresses</h4>
+                @if (detail.Addresses.Count == 0)
+                {
+                    <p>No addresses.</p>
+                }
+                else
+                {
+                    <ul>
+                        @foreach (var address in detail.Addresses)
+                        {
+                            <li>@address.Street @address.HouseNumber, @address.PostalCode @address.City</li>
+                        }
+                    </ul>
+                }
+
+                <h4>Phone numbers</h4>
+                @if (detail.Phones.Count == 0)
+                {
+                    <p>No phone numbers.</p>
+                }
+                else
+                {
+                    <ul>
+                        @foreach (var phone in detail.Phones)
+                        {
+                            <li>@phone.Number</li>
+                        }
+                    </ul>
+                }
+            </div>
+        }
+    </ChildContent>
+
+    <ActionTemplate>
+        <FluentButton Appearance="ButtonAppearance.Primary" OnClick="CloseAsync">
+            Close
+        </FluentButton>
+    </ActionTemplate>
+</FluentDialogBody>
+
+@code {
+    [CascadingParameter]
+    public required IDialogInstance Dialog { get; set; }
+
+    [Parameter]
+    public int PersonId { get; set; }
+
+    private PersonDetailDto? detail;
+
+    protected override async Task OnInitializedAsync()
+    {
+        detail = await PersonService.GetPersonByIdAsync(PersonId);
+    }
+
+    private Task CloseAsync() => Dialog.CloseAsync();
+}

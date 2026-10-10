@@ -47,3 +47,25 @@ body {
   padding: 1rem;
   color: white;
 }
+
+.person-detail h4 {
+  margin: 0 0 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.person-detail p,
+.person-detail ul {
+  margin: 0 0 1rem;
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.person-detail ul {
+  padding-left: 1.25rem;
+}
+
+.person-detail li {
+  margin: 0.25rem 0;
+  cursor: default;
+}

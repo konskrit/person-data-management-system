@@ -9,11 +9,11 @@
     <link rel="stylesheet" href="@Assets["app.css"]" />
     <link rel="stylesheet" href="@Assets["PersonDataManagementSystem.styles.css"]" />
     <ImportMap />
-    <HeadOutlet />
+    <HeadOutlet @rendermode="InteractiveServer" />
 </head>
 
 <body>
-    <Routes />
+    <Routes @rendermode="InteractiveServer" />
     <ReconnectModal />
     <script type="module" src="@Assets["Web/Layout/ReconnectModal.razor.js"]" suppress-error="BL9992"></script>
     <script src="@Assets["_framework/blazor.web.js"]" suppress-error="BL9992"></script>

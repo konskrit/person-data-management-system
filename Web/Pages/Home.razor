@@ -1,8 +1,9 @@
 @page "/"
-@rendermode InteractiveServer
 @using PersonDataManagementSystem.Application.Dtos
 @using PersonDataManagementSystem.Application.Interfaces
+@using PersonDataManagementSystem.Web.Components
 @inject IPersonService PersonService
+@inject IDialogService DialogService
 
 <PageTitle>Persons</PageTitle>
 
@@ -30,6 +31,8 @@
 
     <FluentDataGrid TGridItem="PersonListItemDto"
                     Items="@persons.AsQueryable()"
+                    ShowHover="true"
+                    OnRowClick="OpenPersonDetailAsync"
                     Style="width: 100%;">
         <PropertyColumn Property="@(p => p.Id)" Title="Id" />
         <PropertyColumn Property="@(p => p.LastName)" Title="Last name" />
@@ -55,5 +58,17 @@
         {
             isLoading = false;
         }
+    }
+
+    private async Task OpenPersonDetailAsync(FluentDataGridRow<PersonListItemDto> row)
+    {
+        if (row.Item is null)
+            return;
+
+        await DialogService.ShowDialogAsync<PersonDetailDialog>(options =>
+        {
+            options.Modal = false;
+            options.Parameters.Add(nameof(PersonDetailDialog.PersonId), row.Item.Id);
+        });
     }
 }
