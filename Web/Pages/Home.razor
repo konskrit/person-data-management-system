@@ -9,11 +9,24 @@
 <FluentStack Orientation="Orientation.Vertical" VerticalGap="16">
     <FluentLabel Typo="Typography.Header">Persons</FluentLabel>
 
-    <FluentButton Appearance="ButtonAppearance.Primary"
-                  Disabled="@isLoading"
-                  OnClick="LoadPersonsAsync">
-        @(isLoading ? "Loading..." : "Load persons")
-    </FluentButton>
+    <form @onsubmit="LoadPersonsAsync" @onsubmit:preventDefault>
+        <FluentStack Orientation="Orientation.Vertical" VerticalGap="4">
+            <FluentLabel ForId="name-filter">Name</FluentLabel>
+            <FluentStack Orientation="Orientation.Horizontal" HorizontalGap="12" VerticalAlignment="VerticalAlignment.Center">
+                <FluentTextInput Id="name-filter"
+                                 @bind-Value="nameFilter"
+                                 Placeholder="Optional search"
+                                 Immediate="true"
+                                 Style="min-width: 16rem;" />
+                <FluentButton Appearance="ButtonAppearance.Primary"
+                              ButtonType="ButtonType.Button"
+                              Disabled="@isLoading"
+                              OnClick="LoadPersonsAsync">
+                    @(isLoading ? "Loading..." : "Load persons")
+                </FluentButton>
+            </FluentStack>
+        </FluentStack>
+    </form>
 
     <FluentDataGrid TGridItem="PersonListItemDto"
                     Items="@persons.AsQueryable()"
@@ -27,6 +40,7 @@
 
 @code {
     private List<PersonListItemDto> persons = [];
+    private string? nameFilter;
     private bool isLoading;
 
     private async Task LoadPersonsAsync()
@@ -34,7 +48,7 @@
         isLoading = true;
         try
         {
-            var result = await PersonService.GetPersonsAsync(name: null);
+            var result = await PersonService.GetPersonsAsync(nameFilter);
             persons = [.. result];
         }
         finally

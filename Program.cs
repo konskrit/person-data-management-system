@@ -2,8 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.FluentUI.AspNetCore.Components;
 using PersonDataManagementSystem.Application.Interfaces;
 using PersonDataManagementSystem.Application.Services;
-using PersonDataManagementSystem.Web;
 using PersonDataManagementSystem.Data;
+using PersonDataManagementSystem.Web;
 using Scalar.AspNetCore;
 
 DotNetEnv.Env.TraversePath().Load();
