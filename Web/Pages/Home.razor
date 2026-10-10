@@ -66,10 +66,13 @@
         if (row.Item is null)
             return;
 
-        await DialogService.ShowDialogAsync<PersonDetailDialog>(options =>
+        var result = await DialogService.ShowDialogAsync<PersonDetailDialog>(options =>
         {
             options.Modal = false;
             options.Parameters.Add(nameof(PersonDetailDialog.PersonId), row.Item.Id);
         });
+
+        if (!result.Cancelled)
+            await LoadPersonsAsync();
     }
 }

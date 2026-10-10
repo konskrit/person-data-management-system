@@ -10,54 +10,125 @@
     <ChildContent>
         @if (detail is null)
         {
-            <p>Loading...</p>
+            <p class="person-detail-value">Loading...</p>
+        }
+        else if (confirmDelete)
+        {
+            <p class="person-detail-value">
+                Delete @detail.FirstName @detail.LastName? This cannot be undone.
+            </p>
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <p class="person-detail-error">@errorMessage</p>
+            }
         }
         else
         {
             <div class="person-detail">
-                <h4>Name</h4>
-                <p>@detail.FirstName @detail.LastName</p>
+                <div class="person-detail-field">
+                    <label class="person-detail-label" for="detail-first-name">First name</label>
+                    <FluentTextInput Id="detail-first-name"
+                                     @bind-Value="firstName"
+                                     Immediate="true"
+                                     ImmediateDelay="0"
+                                     Style="width: 100%;" />
+                </div>
 
-                <h4>Birth date</h4>
-                <p>@detail.BirthDate.ToString("yyyy-MM-dd")</p>
+                <div class="person-detail-field">
+                    <label class="person-detail-label" for="detail-last-name">Last name</label>
+                    <FluentTextInput Id="detail-last-name"
+                                     @bind-Value="lastName"
+                                     Immediate="true"
+                                     ImmediateDelay="0"
+                                     Style="width: 100%;" />
+                </div>
 
-                <h4>Addresses</h4>
-                @if (detail.Addresses.Count == 0)
-                {
-                    <p>No addresses.</p>
-                }
-                else
-                {
-                    <ul>
-                        @foreach (var address in detail.Addresses)
+                <div class="person-detail-field">
+                    <span class="person-detail-label">Birth date</span>
+                    <p class="person-detail-value">@detail.BirthDate.ToString("yyyy-MM-dd")</p>
+                </div>
+
+                <div class="person-detail-field">
+                    <span class="person-detail-label">Addresses</span>
+                    <div class="person-detail-value">
+                        @if (detail.Addresses.Count == 0)
                         {
-                            <li>@address.Street @address.HouseNumber, @address.PostalCode @address.City</li>
+                            <span>No addresses.</span>
                         }
-                    </ul>
-                }
-
-                <h4>Phone numbers</h4>
-                @if (detail.Phones.Count == 0)
-                {
-                    <p>No phone numbers.</p>
-                }
-                else
-                {
-                    <ul>
-                        @foreach (var phone in detail.Phones)
+                        else
                         {
-                            <li>@phone.Number</li>
+                            <ul>
+                                @foreach (var address in detail.Addresses)
+                                {
+                                    <li>@address.Street @address.HouseNumber, @address.PostalCode @address.City</li>
+                                }
+                            </ul>
                         }
-                    </ul>
+                    </div>
+                </div>
+
+                <div class="person-detail-field">
+                    <span class="person-detail-label">Phone numbers</span>
+                    <div class="person-detail-value">
+                        @if (detail.Phones.Count == 0)
+                        {
+                            <span>No phone numbers.</span>
+                        }
+                        else
+                        {
+                            <ul>
+                                @foreach (var phone in detail.Phones)
+                                {
+                                    <li>@phone.Number</li>
+                                }
+                            </ul>
+                        }
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    <p class="person-detail-error">@errorMessage</p>
                 }
             </div>
         }
     </ChildContent>
 
     <ActionTemplate>
-        <FluentButton Appearance="ButtonAppearance.Primary" OnClick="CloseAsync">
-            Close
-        </FluentButton>
+        @if (confirmDelete)
+        {
+            <FluentButton Appearance="ButtonAppearance.Outline"
+                          Disabled="@isBusy"
+                          OnClick="CancelDelete">
+                Cancel
+            </FluentButton>
+            <FluentButton Appearance="ButtonAppearance.Primary"
+                          Disabled="@isBusy"
+                          OnClick="DeleteAsync">
+                @(isBusy ? "Deleting..." : "Delete")
+            </FluentButton>
+        }
+        else
+        {
+            <FluentButton Appearance="ButtonAppearance.Outline"
+                          ButtonType="ButtonType.Button"
+                          Disabled="@(detail is null || isBusy)"
+                          OnClick="AskDelete">
+                Delete
+            </FluentButton>
+            <FluentButton Appearance="ButtonAppearance.Outline"
+                          ButtonType="ButtonType.Button"
+                          Disabled="@(detail is null || isBusy)"
+                          OnClick="CloseAsync">
+                Close
+            </FluentButton>
+            <FluentButton Appearance="ButtonAppearance.Primary"
+                          ButtonType="ButtonType.Button"
+                          Disabled="@(detail is null || isBusy)"
+                          OnClick="SaveAsync">
+                @(isBusy ? "Saving..." : "Save")
+            </FluentButton>
+        }
     </ActionTemplate>
 </FluentDialogBody>
 
@@ -69,11 +140,97 @@
     public int PersonId { get; set; }
 
     private PersonDetailDto? detail;
+    private string firstName = "";
+    private string lastName = "";
+    private bool confirmDelete;
+    private bool isBusy;
+    private string? errorMessage;
 
     protected override async Task OnInitializedAsync()
     {
         detail = await PersonService.GetPersonByIdAsync(PersonId);
+        if (detail is null)
+            return;
+
+        firstName = detail.FirstName;
+        lastName = detail.LastName;
     }
 
-    private Task CloseAsync() => Dialog.CloseAsync();
+    private async Task SaveAsync()
+    {
+        if (detail is null)
+            return;
+
+        var trimmedFirst = firstName.Trim();
+        var trimmedLast = lastName.Trim();
+        if (string.IsNullOrWhiteSpace(trimmedFirst) || string.IsNullOrWhiteSpace(trimmedLast))
+        {
+            errorMessage = "First and last name are required.";
+            return;
+        }
+
+        if (trimmedFirst == detail.FirstName && trimmedLast == detail.LastName)
+            return;
+
+        isBusy = true;
+        errorMessage = null;
+        try
+        {
+            var updated = await PersonService.UpdatePersonNameAsync(
+                PersonId,
+                new UpdatePersonNameDto(trimmedLast, trimmedFirst));
+
+            if (updated is null)
+            {
+                errorMessage = "Person was not found.";
+                return;
+            }
+
+            await Dialog.CloseAsync(true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+        finally
+        {
+            isBusy = false;
+        }
+    }
+
+    private void AskDelete()
+    {
+        errorMessage = null;
+        confirmDelete = true;
+    }
+
+    private void CancelDelete()
+    {
+        errorMessage = null;
+        confirmDelete = false;
+    }
+
+    private async Task DeleteAsync()
+    {
+        if (detail is null)
+            return;
+
+        isBusy = true;
+        errorMessage = null;
+        try
+        {
+            await PersonService.DeletePersonAsync(PersonId);
+            await Dialog.CloseAsync(true);
+        }
+        catch (InvalidOperationException ex)
+        {
+            errorMessage = ex.Message;
+        }
+        finally
+        {
+            isBusy = false;
+        }
+    }
+
+    private Task CloseAsync() => Dialog.CancelAsync();
 }

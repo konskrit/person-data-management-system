@@ -71,6 +71,12 @@ public class PersonService(PersonDbContext db) : IPersonService
         if (person is null)
             return false;
 
+        if (await db.Addresses.AnyAsync(a => a.PersonId == id, cancellationToken)
+            || await db.Phones.AnyAsync(p => p.PersonId == id, cancellationToken))
+        {
+            throw new InvalidOperationException("Person still has addresses or phone numbers.");
+        }
+
         db.Persons.Remove(person);
         await db.SaveChangesAsync(cancellationToken);
         return true;

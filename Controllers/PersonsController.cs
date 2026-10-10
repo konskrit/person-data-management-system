@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using PersonDataManagementSystem.Application.Dtos;
 using PersonDataManagementSystem.Application.Interfaces;
 
@@ -45,9 +44,9 @@ public class PersonsController(IPersonService personService) : ControllerBase
             var deleted = await personService.DeletePersonAsync(id, cancellationToken);
             return deleted ? NoContent() : NotFound();
         }
-        catch (DbUpdateException)
+        catch (InvalidOperationException ex)
         {
-            return Conflict("Person still has addresses or phone numbers.");
+            return Conflict(ex.Message);
         }
     }
 }
