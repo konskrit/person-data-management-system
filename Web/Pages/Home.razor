@@ -1,19 +1,45 @@
 @page "/"
+@rendermode InteractiveServer
+@using PersonDataManagementSystem.Application.Dtos
+@using PersonDataManagementSystem.Application.Interfaces
+@inject IPersonService PersonService
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Persons</PageTitle>
 
 <FluentStack Orientation="Orientation.Vertical" VerticalGap="16">
-    <FluentLabel Typo="Typography.Header">Fluent UI is ready</FluentLabel>
-    <FluentLabel>
-        Blazor Web App scaffold with Fluent UI.
-    </FluentLabel>
-    <FluentButton Appearance="ButtonAppearance.Primary" OnClick="Increment">
-        Clicked @count time(s)
+    <FluentLabel Typo="Typography.Header">Persons</FluentLabel>
+
+    <FluentButton Appearance="ButtonAppearance.Primary"
+                  Disabled="@isLoading"
+                  OnClick="LoadPersonsAsync">
+        @(isLoading ? "Loading..." : "Load persons")
     </FluentButton>
+
+    <FluentDataGrid TGridItem="PersonListItemDto"
+                    Items="@persons.AsQueryable()"
+                    Style="width: 100%;">
+        <PropertyColumn Property="@(p => p.Id)" Title="Id" />
+        <PropertyColumn Property="@(p => p.LastName)" Title="Last name" />
+        <PropertyColumn Property="@(p => p.FirstName)" Title="First name" />
+        <PropertyColumn Property="@(p => p.BirthDate)" Title="Birth date" Format="yyyy-MM-dd" />
+    </FluentDataGrid>
 </FluentStack>
 
 @code {
-    private int count;
+    private List<PersonListItemDto> persons = [];
+    private bool isLoading;
 
-    private void Increment() => count++;
+    private async Task LoadPersonsAsync()
+    {
+        isLoading = true;
+        try
+        {
+            var result = await PersonService.GetPersonsAsync(name: null);
+            persons = [.. result];
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
 }
