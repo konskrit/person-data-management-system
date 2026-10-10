@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.FluentUI.AspNetCore.Components;
 using PersonDataManagementSystem.Application.Interfaces;
 using PersonDataManagementSystem.Application.Services;
+using PersonDataManagementSystem.Web;
 using PersonDataManagementSystem.Data;
 using Scalar.AspNetCore;
 
@@ -13,6 +15,9 @@ var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING")
 
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
+builder.Services.AddRazorComponents()
+    .AddInteractiveServerComponents();
+builder.Services.AddFluentUIComponents();
 builder.Services.AddDbContext<PersonDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddScoped<IPersonService, PersonService>();
@@ -24,10 +29,19 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.MapScalarApiReference();
 }
+else
+{
+    app.UseExceptionHandler("/Error", createScopeForErrors: true);
+    app.UseHsts();
+}
 
+app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 app.UseHttpsRedirection();
-app.MapControllers();
+app.UseAntiforgery();
 
-app.MapGet("/", () => "I am alive!");
+app.MapStaticAssets();
+app.MapControllers();
+app.MapRazorComponents<App>()
+    .AddInteractiveServerRenderMode();
 
 app.Run();

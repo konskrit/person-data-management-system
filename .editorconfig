@@ -1,0 +1,12 @@
+root = true
+
+[*.{cs,razor}]
+indent_style = space
+indent_size = 4
+
+# App.razor is the Blazor document root; script tags here are required.
+[**/App.razor]
+dotnet_diagnostic.RZ9992.severity = none
+dotnet_diagnostic.BL9992.severity = none
+razor_diagnostic_RZ9992_severity = none
+razor_diagnostic_BL9992_severity = none

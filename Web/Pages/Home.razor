@@ -1,0 +1,19 @@
+@page "/"
+
+<PageTitle>Home</PageTitle>
+
+<FluentStack Orientation="Orientation.Vertical" VerticalGap="16">
+    <FluentLabel Typo="Typography.Header">Fluent UI is ready</FluentLabel>
+    <FluentLabel>
+        Blazor Web App scaffold with Fluent UI.
+    </FluentLabel>
+    <FluentButton Appearance="ButtonAppearance.Primary" OnClick="Increment">
+        Clicked @count time(s)
+    </FluentButton>
+</FluentStack>
+
+@code {
+    private int count;
+
+    private void Increment() => count++;
+}
