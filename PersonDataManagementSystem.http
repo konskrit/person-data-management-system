@@ -1,3 +1,25 @@
-@PersonDataManagementSystem_HostAddress = http://localhost:5048
+@host = http://localhost:5048
 
-###
+### Alive
+GET {{host}}/
+
+### List persons
+GET {{host}}/api/persons
+
+### Search persons by name
+GET {{host}}/api/persons?name=Müller
+
+### Person details
+GET {{host}}/api/persons/1
+
+### Update person name
+PUT {{host}}/api/persons/1
+Content-Type: application/json
+
+{
+  "lastName": "Müller",
+  "firstName": "Anna"
+}
+
+### Delete person (expect 409 while addresses/phones exist)
+DELETE {{host}}/api/persons/1
