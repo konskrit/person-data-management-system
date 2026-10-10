@@ -1,0 +1,13 @@
+namespace PersonDataManagementSystem.Data.Entities;
+
+public class Address
+{
+    public int Id { get; set; }
+    public int PersonId { get; set; }
+    public required string PostalCode { get; set; }
+    public required string City { get; set; }
+    public required string Street { get; set; }
+    public required string HouseNumber { get; set; }
+
+    public required Person Person { get; set; }
+}
